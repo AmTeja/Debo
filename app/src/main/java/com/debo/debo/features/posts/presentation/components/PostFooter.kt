@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.outlined.Comment
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -22,14 +23,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.debo.debo.features.home.presentation.FeedViewModel
 import com.debo.debo.features.posts.domain.model.Post
 import com.debo.debo.features.posts.presentation.PostViewModel
 import com.debo.debo.util.timeAgo
 
 @Composable
-fun PostFooter(post: Post, userId: String, viewModel: PostViewModel) {
+fun PostFooter(
+    post: Post,
+    userId: String,
+    viewModel: PostViewModel,
+    feedViewModel: FeedViewModel = hiltViewModel()
+) {
 
-    Log.d(ContentValues.TAG, "TextPostFooter: $userId")
     val isLiked = remember { mutableStateOf(post.likes.contains(userId)) }
     val likesCount = remember { mutableIntStateOf(post.likes.size) }
 
@@ -48,28 +55,48 @@ fun PostFooter(post: Post, userId: String, viewModel: PostViewModel) {
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(2.dp)
             ) {
+
+                IconButton(
+                    modifier = Modifier.padding(0.dp),
+                    onClick = {
+                        feedViewModel.toggleCommentPanelVisibility(post)
+                    }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Comment,
+                        contentDescription = null,
+                        Modifier.padding(0.dp)
+                    )
+                }
+                Text(
+                    text = "0",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(end = 16.dp)
+                )
+                IconButton(
+                    modifier = Modifier.padding(0.dp),
+                    onClick = {
+                        isLiked.value = !isLiked.value
+                        if (isLiked.value) {
+                            likesCount.intValue++
+                            viewModel.likePost(post.id!!)
+                        } else {
+                            likesCount.intValue--
+                            viewModel.unlikePost(post.id!!)
+                        }
+                    }) {
+                    Icon(
+                        imageVector = if (isLiked.value) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                        contentDescription = null,
+                        Modifier.padding(0.dp)
+                    )
+                }
                 Text(
                     text = "${likesCount.intValue}",
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier.padding(end = 16.dp)
                 )
-                IconButton(onClick = {
-                    isLiked.value = !isLiked.value
-                    if (isLiked.value) {
-                        likesCount.intValue++
-                        viewModel.likePost(post.id)
-                    } else {
-                        likesCount.intValue--
-                        viewModel.unlikePost(post.id)
-                    }
-                }) {
-                    Icon(
-                        imageVector = if (isLiked.value) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                        contentDescription = null
-                    )
-                }
             }
         }
     }

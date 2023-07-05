@@ -43,7 +43,7 @@ fun LoginScreen(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        val screenHeight = LocalConfiguration.current.screenHeightDp;
+        val screenHeight = LocalConfiguration.current.screenHeightDp
         Column(
             modifier = Modifier
                 .wrapContentHeight(),

@@ -40,7 +40,7 @@ fun RegisterScreen(
     navController: NavController,
     viewModel: AuthenticationViewModel = hiltViewModel()
 ) {
-    val screenHeight = LocalConfiguration.current.screenHeightDp;
+    val screenHeight = LocalConfiguration.current.screenHeightDp
 
     Box(
         modifier = Modifier.fillMaxSize()

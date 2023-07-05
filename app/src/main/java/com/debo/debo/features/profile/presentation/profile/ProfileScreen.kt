@@ -18,7 +18,7 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
 
-    val screenWidth = LocalConfiguration.current.screenWidthDp;
+    val screenWidth = LocalConfiguration.current.screenWidthDp
 
     LaunchedEffect(key1 = true) {
         viewModel.getProfile()

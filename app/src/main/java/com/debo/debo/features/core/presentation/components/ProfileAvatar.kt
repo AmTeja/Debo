@@ -15,9 +15,8 @@ import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun ProfileAvatar(imageUrl: String?, modifier: Modifier = Modifier, size: Dp?) {
-    val screenWidth = LocalConfiguration.current.screenWidthDp;
-    Box(
-    ) {
+    val screenWidth = LocalConfiguration.current.screenWidthDp
+    Box {
         GlideImage(
             imageModel = { imageUrl.orEmpty() },
             modifier = modifier

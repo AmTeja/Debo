@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -27,6 +28,7 @@ import com.debo.debo.features.core.presentation.splash.SplashScreen
 import com.debo.debo.features.home.presentation.feed.FeedScreen
 import com.debo.debo.features.home.presentation.search.SearchScreen
 import com.debo.debo.features.messages.presentation.MessagesScreen
+import com.debo.debo.features.posts.presentation.CreatePostScreen
 import com.debo.debo.features.profile.presentation.profile.ProfileScreen
 import com.debo.debo.ui.theme.DeboTheme
 import com.debo.debo.util.Screen
@@ -70,16 +72,29 @@ fun DeboApp(navController: NavHostController, auth: FirebaseAuth) {
             }
         }
         composable(route = Screen.FeedScreen.route) {
-            FeedScreen(navController, auth = auth)
+            EnterAnimation {
+                FeedScreen(navController, auth = auth)
+            }
         }
         composable(route = Screen.SearchScreen.route) {
-            SearchScreen(navController)
+            EnterAnimation {
+                SearchScreen(navController)
+            }
         }
         composable(route = Screen.MessagesScreen.route) {
-            MessagesScreen(navController)
+            EnterAnimation {
+                MessagesScreen(navController)
+            }
         }
         composable(route = Screen.ProfileScreen.route) {
-            ProfileScreen(navController)
+            EnterAnimation {
+                ProfileScreen(navController)
+            }
+        }
+        composable(route = Screen.CreatePostScreen.route) {
+            EnterAnimation {
+                CreatePostScreen(navController)
+            }
         }
     }
 }
@@ -94,9 +109,8 @@ fun EnterAnimation(content: @Composable () -> Unit) {
         ) + expandVertically(
             expandFrom = Alignment.Top
         ) + fadeIn(initialAlpha = 0.3f),
-        exit = slideOutVertically() + shrinkVertically() + fadeOut(),
-        content = content,
-        initiallyVisible = false
-    )
+        exit = slideOutVertically() + shrinkVertically() + fadeOut()) {
+        content()
+    }
 }
 

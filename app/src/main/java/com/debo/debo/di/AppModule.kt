@@ -11,6 +11,7 @@ import com.debo.debo.features.authentication.domain.use_cases.Logout
 import com.debo.debo.features.authentication.domain.use_cases.Register
 import com.debo.debo.features.posts.data.repository.PostRepositoryImpl
 import com.debo.debo.features.posts.domain.repository.PostRepository
+import com.debo.debo.features.posts.domain.use_cases.CreatePost
 import com.debo.debo.features.posts.domain.use_cases.GetPosts
 import com.debo.debo.features.posts.domain.use_cases.LikePost
 import com.debo.debo.features.posts.domain.use_cases.PostUseCases
@@ -102,6 +103,7 @@ object AppModule {
         PostUseCases(
             getPosts = GetPosts(repository),
             likePost = LikePost(repository),
-            unlikePost = UnlikePost(repository)
+            unlikePost = UnlikePost(repository),
+            createPost = CreatePost(repository)
         )
 }

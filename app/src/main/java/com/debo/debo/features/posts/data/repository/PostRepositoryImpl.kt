@@ -3,6 +3,7 @@ package com.debo.debo.features.posts.data.repository
 import android.content.ContentValues.TAG
 import android.util.Log
 import com.debo.debo.features.authentication.domain.model.User
+import com.debo.debo.features.posts.domain.model.Comment
 import com.debo.debo.features.posts.domain.model.ImagePost
 import com.debo.debo.features.posts.domain.model.Post
 import com.debo.debo.features.posts.domain.model.TextPost
@@ -16,6 +17,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -45,14 +47,28 @@ class PostRepositoryImpl @Inject constructor(
                             Log.d(TAG, "getPosts: $post")
                             if (post != null) {
                                 //get post likes
-                                firestore.collection(Constants.POSTS_COLLECTION).document(post.id)
+                                firestore.collection(Constants.POSTS_COLLECTION).document(post.id!!)
                                     .collection(Constants.LIKES_COLLECTION).get()
                                     .addOnSuccessListener { likesQuerySnapshot ->
                                         val likes = mutableListOf<String>()
                                         for (likeDocument in likesQuerySnapshot.documents) {
-                                            likes.add(likeDocument.id)
+                                            likes.add(likeDocument["userId"].toString())
                                         }
                                         post.likes = likes
+                                    }.addOnFailureListener { exception ->
+                                        continuation.resumeWithException(exception)
+                                    }
+
+                                //get post comments
+                                firestore.collection(Constants.LIKES_COLLECTION).document(post.id!!)
+                                    .collection(Constants.COMMENTS_COLLECTION).get()
+                                    .addOnSuccessListener { commentsQuerySnapshot ->
+                                        val comments = mutableListOf<Comment>()
+                                        for (commentDocument in commentsQuerySnapshot.documents) {
+                                            val comment = commentDocument.toObject(Comment::class.java)
+                                            comments.add(comment!!)
+                                        }
+                                        post.comments = comments
                                     }.addOnFailureListener { exception ->
                                         continuation.resumeWithException(exception)
                                     }
@@ -76,6 +92,7 @@ class PostRepositoryImpl @Inject constructor(
                                     }.addOnFailureListener { exception ->
                                         continuation.resumeWithException(exception)
                                     }
+
                             }
                         }
                     }.addOnFailureListener {
@@ -88,8 +105,31 @@ class PostRepositoryImpl @Inject constructor(
         awaitClose()
     }
 
-    override fun createPost(post: Post): Flow<Response<Boolean>> {
-        TODO("Not yet implemented")
+    override fun createPost(post: Post): Flow<Response<Boolean>> = flow {
+        emit(Response.Loading)
+        try {
+            suspendCoroutine<Post> { continuation ->
+                val userId = auth.currentUser?.uid ?: ""
+                post.id = firestore.collection(Constants.POSTS_COLLECTION).document().id
+                post.userId = userId
+                post.postType = when (post) {
+                    is ImagePost -> "IMAGE"
+                    is VideoPost -> "VIDEO"
+                    is TextPost -> "TEXT"
+                    else -> "TEXT"
+                }
+                firestore.collection(Constants.POSTS_COLLECTION).document(post.id!!)
+                    .set(post)
+                    .addOnSuccessListener {
+                        continuation.resume(post)
+                    }.addOnFailureListener {
+                        continuation.resumeWithException(it)
+                    }
+            }
+            emit(Response.Success(true))
+        } catch (e: Exception) {
+            emit(Response.Error(e.localizedMessage ?: "An Unknown Error has occurred!"))
+        }
     }
 
     override fun deletePost(postId: String): Flow<Response<Boolean>> {

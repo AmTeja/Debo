@@ -12,11 +12,7 @@ import com.debo.debo.features.home.presentation.components.BottomNavigationItem
 
 @Composable
 fun ProfileError(navController: NavController) {
-    Scaffold(
-        bottomBar = {
-            BottomNavBar(selectedItem = BottomNavigationItem.PROFILE, navController)
-        }
-    ) { innerPadding ->
+    Scaffold { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             Text(text = "Failed to load profile")
         }

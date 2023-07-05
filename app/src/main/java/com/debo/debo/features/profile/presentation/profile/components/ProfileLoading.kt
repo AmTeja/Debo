@@ -14,11 +14,7 @@ import com.debo.debo.features.home.presentation.components.BottomNavigationItem
 
 @Composable
 fun ProfileLoading(navController: NavController) {
-    Scaffold(
-        bottomBar = {
-            BottomNavBar(selectedItem = BottomNavigationItem.PROFILE, navController)
-        }
-    ) { innerPadding ->
+    Scaffold { innerPadding ->
         Box(
             modifier = Modifier
                 .padding(innerPadding)

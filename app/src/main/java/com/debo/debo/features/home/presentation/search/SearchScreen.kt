@@ -14,14 +14,7 @@ import com.debo.debo.features.home.presentation.components.BottomNavigationItem
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(navController: NavController) {
-    Scaffold(
-        bottomBar = {
-            BottomNavBar(
-                selectedItem = BottomNavigationItem.SEARCH,
-                navController
-            )
-        }
-    ) { innerPadding ->
+    Scaffold { innerPadding ->
         Surface(
             modifier = Modifier.padding(innerPadding)
         ) {
